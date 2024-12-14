@@ -2,9 +2,9 @@ name: Build and Push Docker Image
 
 on:
   push:
-    tags:
-      - '*'  # Срабатывает на любые теги (если нужен определённый формат - например, v*, укажите в этом месте)
-
+    branches:
+      - main  
+      
   workflow_dispatch:
     inputs:
       image_tag:
