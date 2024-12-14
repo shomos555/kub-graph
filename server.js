@@ -94,7 +94,7 @@ app.get('/api/data', async (req, res) => {
     res.json(data);
     console.log('Данные успешно отправлены.');
   } catch (err) {
-    console.error('Ошибкапри обработке запроса /api/data:', err);
+    console.error('Ошибка при обработке запроса /api/data:', err);
     res.status(500).send({ error: 'Ошибка сервера', details: err.message });
   }
 });
