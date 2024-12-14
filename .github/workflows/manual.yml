@@ -2,16 +2,11 @@ name: Build and Push Docker Image
 
 on:
   push:
+    tags:
+      - '*'  # Срабатывает на любые теги
     branches:
-      - main  
+      - main  # Можно также указать основной ветку для этой работы
       
-  workflow_dispatch:
-    inputs:
-      image_tag:
-        description: 'Tag for Docker image'
-        required: true
-        default: 'latest' # Тег по умолчанию
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -30,8 +25,10 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  # Для авторизации с Docker Hub
 
       - name: Get Git Tag
-        run: echo "TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV  # Извлекаем тег из репозитория и сохраняем в переменной
-
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          echo "TAG=$TAG" >> $GITHUB_ENV
+          
       - name: Build Docker Image
         run: docker build -t shomos/kub-graph:${{ env.TAG }} .  # Сборка образа с тегом из Git
 
