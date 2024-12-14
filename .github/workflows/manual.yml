@@ -2,8 +2,9 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches:
-      - main  # Триггер: этот action сработает при push в ветку main
+    tags:
+      - '*'  # Срабатывает на любые теги (если нужен определённый формат - например, v*, укажите в этом месте)
+
   workflow_dispatch:
     inputs:
       image_tag:
@@ -28,8 +29,11 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  # Для авторизации с Docker Hub
 
+      - name: Get Git Tag
+        run: echo "TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV  # Извлекаем тег из репозитория и сохраняем в переменной
+
       - name: Build Docker Image
-        run: docker build -t shomos/kub-graph:${{ inputs.image_tag }} .  # Шаг сборки образа
+        run: docker build -t shomos/kub-graph:${{ env.TAG }} .  # Сборка образа с тегом из Git
 
       - name: Push Docker Image
-        run: docker push shomos/kub-graph:${{ inputs.image_tag }}  # Шаг отправки образа в Docker Hub
+        run: docker push shomos/kub-graph:${{ env.TAG }}  # Отправка в Docker Hub с использованием тега из Git
