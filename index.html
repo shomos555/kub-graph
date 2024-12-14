@@ -9,13 +9,10 @@
     #cy {
       width: 100%;
       height: 100vh;
-      background: repeating-linear-gradient(
-        45deg,
-        #0d0d4f,
-        #0d0d4f 10px,
-        #1a1a8a 10px,
-        #1a1a8a 20px
-      );
+      background: #0d0d4f; /* Основной фон */
+      background-image: linear-gradient(#1a1a8a 1px, transparent 1px),
+                        linear-gradient(90deg, #1a1a8a 1px, transparent 1px);
+      background-size: 20px 20px; /* Размер клеточек */
     }
   </style>
 </head>
@@ -41,19 +38,28 @@
     function renderGraph(data) {
       const elements = [];
 
+      // Pods - круглые
       data.pods.forEach((pod) => {
-        elements.push({ data: { id: pod.name, label: pod.name } });
+        elements.push({ 
+          data: { id: pod.name, label: pod.name, type: 'pod' }
+        });
       });
 
+      // Services - прямоугольники
       data.services.forEach((service) => {
-        elements.push({ data: { id: service.name, label: service.name } });
+        elements.push({ 
+          data: { id: service.name, label: service.name, type: 'service' }
+        });
         service.pods.forEach((pod) => {
           elements.push({ data: { source: service.name, target: pod } });
         });
       });
 
+      // Ingresses - шестиугольники
       data.ingresses.forEach((ingress) => {
-        elements.push({ data: { id: ingress.name, label: ingress.name } });
+        elements.push({
+          data: { id: ingress.name, label: ingress.name, type: 'ingress' }
+        });
         ingress.rules.forEach((rule) => {
           if (rule.backend && rule.backend.service) {
             elements.push({ data: { source: ingress.name, target: rule.backend.service.name } });
@@ -66,15 +72,40 @@
         elements,
         style: [
           {
-            selector: 'node',
+            selector: 'node[type="pod"]',
             style: {
-              'background-color': '#007ACC',
+              'background-color': '#28a745',
+              'shape': 'ellipse',
               'label': 'data(label)',
               'text-halign': 'center',
               'text-valign': 'center',
-              'font-size': '12px',
-              'color': '#ffffff',
-            },
+              'color': '#fff',
+              'font-size': '12px'
+            }
+          },
+          {
+            selector: 'node[type="service"]',
+            style: {
+              'background-color': '#007bff',
+              'shape': 'rectangle',
+              'label': 'data(label)',
+              'text-halign': 'center',
+              'text-valign': 'center',
+              'color': '#fff',
+              'font-size': '12px'
+            }
+          },
+          {
+            selector: 'node[type="ingress"]',
+            style: {
+              'background-color': '#ff8c00',
+              'shape': 'hexagon',
+              'label': 'data(label)',
+              'text-halign': 'center',
+              'text-valign': 'center',
+              'color': '#fff',
+              'font-size': '12px'
+            }
           },
           {
             selector: 'edge',
@@ -82,13 +113,15 @@
               'width': 2,
               'line-color': '#ffffff',
               'target-arrow-color': '#ffffff',
-              'target-arrow-shape': 'triangle',
-            },
-          },
+              'target-arrow-shape': 'triangle'
+            }
+          }
         ],
         layout: {
-          name: 'circle',
-        },
+          name: 'breadthfirst', // Используем структурированный layout
+          directed: true,
+          padding: 20
+        }
       });
     }
 
