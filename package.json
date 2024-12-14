@@ -4,8 +4,9 @@
   "description": "Простое приложение для Kubernetes",
   "main": "server.js",
   "dependencies": {
-    "express": "^4.18.2",
-    "kubernetes-client": "^9.0.0"
+    "@kubernetes/client-node": "^0.22.3",
+    "express": "^4.21.2",
+    "kubernetes-client": "^0.0.1"
   },
   "scripts": {
     "start": "node server.js"

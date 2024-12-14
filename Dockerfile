@@ -2,14 +2,11 @@ FROM node:18
 
 # Установка зависимостей
 WORKDIR /app
-COPY package*.json ./
+COPY package.json ./
 RUN npm install
 
-# Копируем весь проект
-COPY . .
-
-# Указываем порт
-EXPOSE 3000
+# Копируем код приложения
+COPY . /app
 
 # Запуск приложения
 CMD ["node", "server.js"]
