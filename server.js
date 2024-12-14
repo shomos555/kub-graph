@@ -2,11 +2,15 @@ const fs = require('fs');
 const express = require('express');
 const k8s = require('@kubernetes/client-node');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const port = 3000;
 
 app.use(cors()); // Разрешаем CORS
+
+// Раздача статичных файлов (например, index.html) из корня проекта
+app.use(express.static(path.join(__dirname)));
 
 // Инициализация Kubernetes-клиента
 function getK8sClient() {
