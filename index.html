@@ -23,28 +23,41 @@
   <div id="cy"></div>
   <script>
     async function fetchData() {
-      const response = await fetch('/api/data');
-      return response.json();
+      try {
+        console.log('Запрос данных с API...');
+        const response = await fetch('/api/data');
+        if (!response.ok) {
+          throw new Error(`Ошибка API: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+        console.log('Данные успешно получены:', data);
+        return data;
+      } catch (error) {
+        console.error('Ошибка получения данных:', error);
+        alert('Не удалось загрузить данные. Проверьте консоль для деталей.');
+      }
     }
 
     function renderGraph(data) {
       const elements = [];
 
-      data.pods.forEach(pod => {
+      data.pods.forEach((pod) => {
         elements.push({ data: { id: pod.name, label: pod.name } });
       });
 
-      data.services.forEach(service => {
+      data.services.forEach((service) => {
         elements.push({ data: { id: service.name, label: service.name } });
-        service.pods?.forEach(pod => {
-          elements.push({ data: { source: service.name, target: pod.name } });
+        service.pods.forEach((pod) => {
+          elements.push({ data: { source: service.name, target: pod } });
         });
       });
 
-      data.ingresses.forEach(ingress => {
+      data.ingresses.forEach((ingress) => {
         elements.push({ data: { id: ingress.name, label: ingress.name } });
-        ingress.rules.forEach(rule => {
-          elements.push({ data: { source: ingress.name, target: rule.backend.service.name } });
+        ingress.rules.forEach((rule) => {
+          if (rule.backend && rule.backend.service) {
+            elements.push({ data: { source: ingress.name, target: rule.backend.service.name } });
+          }
         });
       });
 
@@ -81,7 +94,9 @@
 
     async function main() {
       const data = await fetchData();
-      renderGraph(data);
+      if (data) {
+        renderGraph(data);
+      }
     }
 
     main();

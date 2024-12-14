@@ -5,6 +5,7 @@
   "main": "server.js",
   "dependencies": {
     "@kubernetes/client-node": "^0.22.3",
+    "cors": "^2.8.5",
     "express": "^4.21.2",
     "kubernetes-client": "^0.0.1"
   },
